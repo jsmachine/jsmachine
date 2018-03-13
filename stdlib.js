@@ -1,0 +1,1 @@
+const elm = (str) => new DOMParser().parseFromString(str, 'text/html');

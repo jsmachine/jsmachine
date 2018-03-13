@@ -1,0 +1,72 @@
+body, * {
+    box-sizing: border-box;
+    font-family: monospace;
+    margin: 0;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+}
+
+#welcome {
+    background-color: #ccc;
+    margin-bottom: 1em;
+}
+
+#commands {
+    max-height: calc(100% - 2em);
+    overflow-y: auto;
+}
+
+.input {
+    background-color: #eee;
+    border: 1px solid #c2cbff;
+    border-collapse: collapse;
+    white-space: pre-wrap;
+}
+.input::before {
+    content: '> ';
+}
+
+.result {
+    margin-bottom: 1em;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+#console {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    height: 3em;
+    padding-top: .5em;
+    border-top: 1px dashed #ccc;
+    transition: height .5s;
+}
+
+#console.multi {
+    height:12em;
+}
+
+#console.multi #console-input {
+    line-height: 1em;
+    overflow-y: auto;
+}
+
+#console-input {
+    overflow-y: hidden;
+    height: 100%;
+    margin-left: 1em;
+    padding-left: .5em;
+    flex: 1;
+    border:1px solid #2222ff;
+    line-height: 2em;
+    resize: none;
+}
