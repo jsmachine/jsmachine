@@ -3,38 +3,43 @@ function Machine() {
     this.code = [];
 }
 
-const NOOP = {};
-
-Machine.prototype.runCode = () => {
-      let result = null;
-      try {
-        result = eval(this.code[this.ip]);
-      } catch (e) {
-        result = e;
-      }
-      this.onRunResult && this.onRunResult(result);
-      return result;
+Machine.prototype.runStep = function (keepRunning = false) {
+    if (this.ip < this.code.length) {
+        let result = null;
+        try {
+            result = eval(this.code[this.ip]);
+        } catch (e) {
+            result = e;
+        }
+        $$ = result;
+        this.onRunResult && this.onRunResult(result);
+        this.ip++;
+        if (result instanceof Promise) {
+            result.then(() => keepRunning && this.runStep(keepRunning))
+        } else {
+            keepRunning && this.runStep(keepRunning);
+        }
+    } else {
+        this.hasFinished = true;
+    }
 };
 
 Machine.prototype.runUrl = function (url) {
-    return fetch(url)
-        .then((result) => result.json())
-        .then(codeArr => {
-            if (typeof codeArr === 'string') {
-                codeArr = codeArr.split('\n');
+    fetch(url)
+        .then((result) => result.text())
+        .then(code => {
+            let codeArr;
+            try {
+                codeArr = JSON.parse(code)
+            } catch (e) {
+                codeArr = code.split('\n')
             }
             this.ip = 0;
             this.code = codeArr;
-            while (this.ip < this.code.length) {
-                let result = this.runLine(this.code[this.ip]);
-                if (result instanceof Promise) {
-                    result.then(() => this.runLine());
-                } else {
-                    this.runLine();
-                }
-            }
-            this.hasFinished = true;
-            this.runLine();
+            this.runStep(true);
+
         })
         .catch(console.error);
 };
+
+machine = new Machine();

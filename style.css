@@ -25,20 +25,45 @@ body {
     overflow-y: auto;
 }
 
-.input {
+x-input {
     background-color: #eee;
     border: 1px solid #c2cbff;
     border-collapse: collapse;
     white-space: pre-wrap;
+    display: block;
+    position: relative;
 }
-.input::before {
+x-input::before {
     content: '> ';
 }
 
-.result {
+x-input delete-button {
+    position:absolute;
+    top:0;
+    right:1em;
+    cursor: pointer;
+}
+
+x-input delete-button::before {
+    content: 'x';
+}
+
+x-result {
+    display: block;
     margin-bottom: 1em;
     max-width: 100%;
     word-wrap: break-word;
+}
+
+x-placeholder {
+    display: block;
+    margin-bottom: 1em;
+    height: 0;
+    transition: all .5s;
+}
+
+x-placeholder.collapse {
+    margin-bottom: 0;
 }
 
 #console {

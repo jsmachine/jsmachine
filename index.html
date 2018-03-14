@@ -4,8 +4,7 @@
         <style type="text/css">
             .hide-loading { display: none }
         </style>
-        <script src="include.js"></script>
-        <script src="machine.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.0/system.js"></script>
         <script>
             function waitTick() {
                 return new Promise(function(resolve) {
@@ -13,7 +12,6 @@
                 });
             }
 
-            const machine = new Machine();
             window.addEventListener('load', function() {
                 const loadingElm = document.createElement('div');
                 loadingElm.innerHTML='Loading';
@@ -24,10 +22,11 @@
                     if (key) {
                         url = 'https://us-central1-jsmachine-us.cloudfunctions.net/get?key=' + key;
                     }
-                    include('display.js')
-                        .then(() => include('stdlib.js'))
-                        .then(() => include('input.js'))
-                        .then(() => include('cssloader.js'))
+                    SystemJS.import('stdlib.js')
+                        .then(() => SystemJS.import('machine.js'))
+                        .then(() => SystemJS.import('display.js'))
+                        .then(() => SystemJS.import('input.js'))
+                        .then(() => SystemJS.import('cssloader.js'))
                         .then(() => includeCSS('style.css'))
                         .then(() => machine.runUrl(url))
                         .then(() => {

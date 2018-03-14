@@ -1,9 +1,8 @@
-var commandsDiv = document.createElement('div');
-commandsDiv.id = 'commands';
+commandsDiv = elm(`<div id="commands">`);
 document.body.appendChild(commandsDiv);
-var returnFormatters = [];
-var isDisplayResultOn = true;
-var isDisplayInputOn = true;
+returnFormatters = [];
+isDisplayResultOn = true;
+isDisplayInputOn = true;
 
 function toggleResultDisplay(state) {
     isDisplayResultOn = typeof state !== 'undefined' ? state : !isDisplayResultOn
@@ -14,7 +13,7 @@ function toggleInputDisplay(state) {
 }
 
 function registerReturnFormatter(filter, formatter) {
-    var handle = {};
+    const handle = {};
     returnFormatters.unshift({
         handle: handle,
         filter: filter,
@@ -22,7 +21,6 @@ function registerReturnFormatter(filter, formatter) {
     });
 }
 
-var Nothing = {};
 // handle all types of results
 registerReturnFormatter(
     function (result) {
@@ -32,12 +30,6 @@ registerReturnFormatter(
         return String(result);
     }
 );
-
-function CallbackFunction(func) {
-    this._func = func;
-}
-
-const cb = (func) => new CallbackFunction(func);
 
 // handle CallbackFunction
 registerReturnFormatter(
@@ -68,16 +60,10 @@ registerReturnFormatter(
 registerReturnFormatter(
     (result) => typeof result === 'string',
     (div, result) => {
-        div.innerHTML = result;
+        div.appendChild(document.createTextNode(result));
         return Nothing;
     }
 );
-
-function Html(strInput) {
-    this._html = strInput;
-}
-
-const html = (str) => new Html(str);
 
 // handle html
 registerReturnFormatter(
@@ -90,11 +76,25 @@ registerReturnFormatter(
     }
 );
 
+// handle show
+registerReturnFormatter(
+    function (result) {
+        return (result instanceof Show);
+    },
+    function (div, result) {
+        if (result._el instanceof Element) {
+            div.appendChild(result._el);
+        } else {
+            throw Error('Not an element');
+        }
+    }
+);
+
 
 function handleResultValue(div, result) {
-    for (var i = 0; i < returnFormatters.length; i++) {
+    for (let i = 0; i < returnFormatters.length; i++) {
         if (returnFormatters[i].filter(result)) {
-            var newResult = returnFormatters[i].formatter(div, result);
+            let newResult = returnFormatters[i].formatter(div, result);
             while (newResult !== Nothing) {
                 newResult = handleResultValue(div, newResult);
             }
@@ -103,17 +103,44 @@ function handleResultValue(div, result) {
     }
 }
 
-function addText(text) {
-    var div = document.createElement('div');
-    div.appendChild(document.createTextNode(text));
-    div.setAttribute('class', 'input');
-    commandsDiv.appendChild(div);
+function addInput(text) {
+    const inputDiv = elm(`
+        <x-input><delete-button></delete-button>${text}</x-input>
+    `);
+    inputDiv.firstChild.addEventListener(
+        'click',
+        () => {
+            let height = inputDiv.offsetHeight;
+            if (inputDiv.nextSibling.nodeName === 'X-RESULT') {
+                height += inputDiv.nextSibling.offsetHeight;
+                document.getElementById('commands').removeChild(inputDiv.nextSibling);
+            }
+            const instruction = [].indexOf.call(document.getElementsByTagName('x-input'), inputDiv);
+
+            const placeholder = elm(`<x-placeholder />`);
+            placeholder.style.height = height + 'px';
+
+            document.getElementById('commands').insertBefore(placeholder, inputDiv);
+            document.getElementById('commands').removeChild(inputDiv);
+
+            setTimeout(() => {
+                placeholder.style.height = 0;
+                placeholder.classList.add('collapse');
+            }, 0);
+
+            setTimeout(() => document.getElementById('commands').removeChild(placeholder), 1000);
+
+            machine.code.splice(instruction, 1);
+            if (machine.ip >= instruction) { machine.ip--; }
+
+        }
+    );
+    commandsDiv.appendChild(inputDiv);
 }
 
 machine.onRunResult = function (result) {
-    addText(machine.code[machine.ip]);
-    var div = document.createElement('div');
-    div.setAttribute('class', 'result');
+    addInput(machine.code[machine.ip]);
+    const div = elm(`<x-result/>`);
     if (isDisplayResultOn) {
         commandsDiv.appendChild(div);
     }
@@ -126,6 +153,8 @@ setTimeout(() => canSave = true, 1000);
 
 function save(override) {
     if ((!canSave || !machine.hasFinished) && !override) return "Save skipped";
+    machine.code.splice(machine.ip, 1);
+    machine.ip--;
     canSave = false;
     setTimeout(() => canSave = true, 10000);
     const codeString = JSON.stringify(machine.code);
@@ -151,6 +180,9 @@ function save(override) {
                 div.innerHTML = 'Saved at this ';
                 div.appendChild(a);
                 window.history.pushState(key, key, '?key=' + key);
+                let saves = localStorage.getItem('saves') ? JSON.parse(localStorage.getItem('saves')) : [];
+                saves.push(key);
+                localStorage.setItem('saves', JSON.stringify(saves));
             })
             .catch(e => {
                 div.innerHTML = 'Error saving :(';
