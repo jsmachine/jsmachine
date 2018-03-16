@@ -1,9 +1,1 @@
-console.log('blabla');
-console.log('asd');
-3+4
-include('https://cdn.rawgit.com/axios/axios/master/dist/axios.min.js');
-axios
-machine.code;
-asd
-toggleDisplay();
-console.log('test');
+
