@@ -5,11 +5,14 @@ isDisplayResultOn = true;
 isDisplayInputOn = true;
 
 function toggleResultDisplay(state) {
-    isDisplayResultOn = typeof state !== 'undefined' ? state : !isDisplayResultOn
+    isDisplayResultOn = typeof state !== 'undefined' ? state : !isDisplayResultOn;
+    return 'Result display ' + (isDisplayResultOn ? 'On' : 'Off');
 }
 
 function toggleInputDisplay(state) {
-    isDisplayInputOn = typeof state !== 'undefined' ? state : !isDisplayInputOn
+    isDisplayInputOn = typeof state !== 'undefined' ? state : !isDisplayInputOn;
+    return 'Input display ' + (isDisplayInputOn ? 'On' : 'Off');
+
 }
 
 function registerReturnFormatter(filter, formatter) {
@@ -84,6 +87,7 @@ registerReturnFormatter(
     function (div, result) {
         if (result._el instanceof Element) {
             div.appendChild(result._el);
+            return Nothing;
         } else {
             throw Error('Not an element');
         }
@@ -105,8 +109,9 @@ function handleResultValue(div, result) {
 
 function addInput(text) {
     const inputDiv = elm(`
-        <x-input><delete-button></delete-button>${text}</x-input>
+        <x-input><delete-button></delete-button></x-input>
     `);
+    inputDiv.appendChild(document.createTextNode(text));
     inputDiv.firstChild.addEventListener(
         'click',
         () => {
@@ -139,7 +144,7 @@ function addInput(text) {
 }
 
 machine.onRunResult = function (result) {
-    addInput(machine.code[machine.ip]);
+    if (isDisplayInputOn) addInput(machine.code[machine.ip]);
     const div = elm(`<x-result/>`);
     if (isDisplayResultOn) {
         commandsDiv.appendChild(div);

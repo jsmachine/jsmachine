@@ -13,9 +13,6 @@
             }
 
             window.addEventListener('load', function() {
-                const loadingElm = document.createElement('div');
-                loadingElm.innerHTML='Loading';
-                document.body.appendChild(loadingElm);
                 try {
                     const key = window.location.href.split('=')[1];
                     let url = 'index.js';
@@ -26,11 +23,10 @@
                         .then(() => SystemJS.import('machine.js'))
                         .then(() => SystemJS.import('display.js'))
                         .then(() => SystemJS.import('input.js'))
-                        .then(() => SystemJS.import('cssloader.js'))
                         .then(() => includeCSS('style.css'))
                         .then(() => machine.runUrl(url))
                         .then(() => {
-                            document.body.removeChild(loadingElm);
+                            document.body.removeChild(document.getElementById('loading'));
                             [].forEach.call(
                                 document.getElementsByClassName('hide-loading'),
                                 (elm) => elm.setAttribute('class', '')
@@ -44,6 +40,10 @@
         </script>
     </head>
     <body>
-        <div class="hide-loading" id="welcome">Welcome, use clear() to clear, use save() to save!</div>
+        <div class="hide-loading" id="welcome">
+            Welcome, use clear() to clear, use save() to save!<br />
+            Issues / feedback? <a href="https://github.com/tommos0/jsmachine">Go to GitHub!</a>
+        </div>
+        <div id="loading">Loading...</div>
     </body>
 </html>
