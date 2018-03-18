@@ -22,6 +22,7 @@ function registerReturnFormatter(filter, formatter) {
         filter: filter,
         formatter: formatter
     });
+    return "OK";
 }
 
 // handle all types of results
@@ -96,13 +97,15 @@ registerReturnFormatter(
 
 
 function handleResultValue(div, result) {
-    for (let i = 0; i < returnFormatters.length; i++) {
-        if (returnFormatters[i].filter(result)) {
-            let newResult = returnFormatters[i].formatter(div, result);
-            while (newResult !== Nothing) {
-                newResult = handleResultValue(div, newResult);
+    if (result !== Nothing) {
+        for (let i = 0; i < returnFormatters.length; i++) {
+            if (returnFormatters[i].filter(result)) {
+                let newResult = returnFormatters[i].formatter(div, result);
+                while (newResult !== Nothing) {
+                    newResult = handleResultValue(div, newResult);
+                }
+                return newResult;
             }
-            return newResult;
         }
     }
 }

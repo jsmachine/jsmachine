@@ -15,7 +15,11 @@ Machine.prototype.runStep = function (keepRunning = false) {
         this.onRunResult && this.onRunResult(result);
         this.ip++;
         if (result instanceof Promise) {
-            result.then(() => keepRunning && this.runStep(keepRunning))
+            $$$ = null;
+            result
+                .then(res => $$$ = res)
+                .then(() => keepRunning && this.runStep(keepRunning))
+                .catch(e => $$$ = e)
         } else {
             keepRunning && this.runStep(keepRunning);
         }

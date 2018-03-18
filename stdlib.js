@@ -39,5 +39,9 @@ function includeCSS(url) {
     return promise;
 }
 
+findLib = (s) => fetch(`https://api.cdnjs.com/libraries?search=${s}`).then(r => r.json()).then(r => r.results);
+
+loadFirst = (s) => findLib(s).then(r => r[0].latest).then(r => SystemJS.import(r));
+
 // allInputs = () => [].filter.call(document.getElementsByTagName('x-input'));
 // allResults = () => [].filter.call(document.getElementById('commands').childNodes, n => n.classList.contains('result'));
