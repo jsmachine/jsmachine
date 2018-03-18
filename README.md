@@ -1,6 +1,7 @@
 # jsmachine
 
-Easy to extend javascript console.
+Easy to extend javascript console. It's like Jupyter notebooks, but for javascript.
+You can easily save and share your results!
 
 Demo at [https://tommos0.github.io/jsmachine](https://tommos0.github.io/jsmachine).
 
