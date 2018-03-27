@@ -11,6 +11,7 @@ module.exports = class {
         editor.setTheme("ace/theme/monokai");
         editor.setAutoScrollEditorIntoView(true);
         editor.setShowPrintMargin(false);
+        editor.on('blur', console.log);
         this._containerElm.appendChild(this._aceElm);
     }
 };

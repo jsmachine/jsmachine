@@ -4,16 +4,26 @@ const Cell = require('cell.js');
 module.exports = class {
     updateDisplay(oldCode, newCode) {
         const oldCodeIds = oldCode.map(code => code.id);
+        const newCodeIds = newCode.map(code => code.id);
         for (let i = 0; i < newCode.length; i++) {
             let cellElm = null;
             if (!oldCodeIds.includes(newCode[i].id)) {
                 cellElm = elm(`<x-cell id="x_cell_${newCode[i].id}"></x-cell>`);
-                this._cells.push(new Cell(cellElm, newCode[i]));
+                const cell = new Cell(cellElm, newCode[i]);
+                cell.onPlay = (id) => {
+                    const idx = this._machine.code.findIndex(code => code.id === id);
+                    this._machine.ip = idx;
+                    this._machine.runStep();
+                };
+                this._cells.push(cell);
             } else {
                 cellElm = this._cells.find(cell => cell._code.id === newCode[i].id)._containerElm;
             }
-            console.log(cellElm);
             this._containerElm.appendChild(cellElm);
+        }
+        for (let id of oldCodeIds.filter(id => !newCodeIds.includes(id))) {
+            const cell = this._cells.find(cell => cell._code.id === id);
+            this._containerElm.removeChild(cell._containerElm);
         }
     }
     constructor(container) {
@@ -93,6 +103,7 @@ module.exports = class {
             } else {
                 cell._containerElm.classList.add('done');
             }
+            cell._outputElm.innerHTML = '';
             this.handleResultValue(cell._outputElm, result);
         };
 

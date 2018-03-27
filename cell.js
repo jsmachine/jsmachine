@@ -43,5 +43,12 @@ module.exports = class {
         };
         this._resizerElm.addEventListener('mousedown', resizerMouseDown, false);
         window.addEventListener('mouseup', resizerMouseUp, false);
+
+        this._playElm = this._headerElm.querySelector('x-cell-header-left>i');
+        this._playElm.addEventListener('click', () => {
+            if (this.onPlay) { this.onPlay(this._code.id); };
+        });
+
+
     }
 };
