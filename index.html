@@ -1,49 +1,17 @@
 <!doctype html>
 <html>
     <head>
-        <style type="text/css">
-            .hide-loading { display: none }
-        </style>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/0.21.0/system.js"></script>
-        <script>
-            function waitTick() {
-                return new Promise(function(resolve) {
-                    window.setTimeout(resolve, 5000);
-                });
-            }
-
-            window.addEventListener('load', function() {
-                try {
-                    const key = window.location.href.split('=')[1];
-                    let url = 'index.js';
-                    if (key) {
-                        url = 'https://us-central1-jsmachine-us.cloudfunctions.net/get?key=' + key;
-                    }
-                    SystemJS.import('stdlib.js')
-                        .then(() => SystemJS.import('machine.js'))
-                        .then(() => SystemJS.import('display.js'))
-                        .then(() => SystemJS.import('input.js'))
-                        .then(() => includeCSS('style.css'))
-                        .then(() => machine.runUrl(url))
-                        .then(() => {
-                            document.body.removeChild(document.getElementById('loading'));
-                            [].forEach.call(
-                                document.getElementsByClassName('hide-loading'),
-                                (elm) => elm.setAttribute('class', '')
-                            );
-                        });
-                } catch (e) {
-                    document.write('Error loading..');
-                    document.write(e);
-                }
-            });
-        </script>
+        <script>window.addEventListener('load', () => SystemJS.import('index.js'));</script>
     </head>
     <body>
         <div class="hide-loading" id="welcome">
             Welcome, use clear() to clear, use save() to save!<br />
             Issues / feedback? <a href="https://github.com/tommos0/jsmachine">Go to GitHub!</a>
         </div>
-        <div id="loading">Loading...</div>
+        <div id="loading" class="hide-loaded">Loading...</div>
+        <x-notebook id="notebook1"></x-notebook>
     </body>
 </html>
